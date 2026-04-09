@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public enum StatusChamado {
     ABERTO,
     EM_ANDAMENTO,
-    CONCLUIDO;
+    CONCLUIDO,
+    CANCELADO;
 
     @JsonCreator
     public static StatusChamado fromString(String value){

@@ -21,62 +21,46 @@ public class ChamadoService {
     public ChamadoResponseDTO criarChamado(ChamadoRequestDTO chamadoDTO){
 
         Chamado chamadoEntity = new Chamado();
-
         chamadoEntity.setTitulo(chamadoDTO.titulo());
         chamadoEntity.setDescricao(chamadoDTO.descricao());
         chamadoEntity.setStatus(StatusChamado.ABERTO);
-        chamadoEntity.setDataCriacao(LocalDateTime.now());
+        chamadoEntity.setIdUsuarioCliente(chamadoDTO.idUsuarioCliente());
+        chamadoEntity.setIdUsuarioOperador("");
 
         Chamado chamadoSalvo = chamadoRepository.save(chamadoEntity);
 
-        return new ChamadoResponseDTO(
-                chamadoSalvo.getId(),
-                chamadoSalvo.getTitulo(),
-                chamadoSalvo.getDescricao(),
-                chamadoSalvo.getStatus(),
-                chamadoSalvo.getDataCriacao()
-        );
+        return ChamadoResponseDTO.fromEntity(chamadoSalvo);
     }
 
     public List<ChamadoResponseDTO> listarChamados(){
-        return chamadoRepository.findAll()
+        return chamadoRepository.findByStatusNot(StatusChamado.CANCELADO)
                 .stream()
-                .map(c -> new ChamadoResponseDTO(c.getId(),c.getTitulo(),c.getDescricao(),c.getStatus(),c.getDataCriacao()))
+                .map(ChamadoResponseDTO::fromEntity)
                 .toList();
     }
 
     public ChamadoResponseDTO buscarChamadoPorId(String id){
-        Chamado chamadoEncontrado = chamadoRepository.findById(id)
+        Chamado chamadoEncontrado = chamadoRepository.findByIdAndStatusNot(id, StatusChamado.CANCELADO)
                 .orElseThrow(() -> new ChamadoNaoEncontradoException("Chamado não encontrado com o ID: " + id));
-        return new ChamadoResponseDTO(
-                chamadoEncontrado.getId(),
-                chamadoEncontrado.getTitulo(),
-                chamadoEncontrado.getDescricao(),
-                chamadoEncontrado.getStatus(),
-                chamadoEncontrado.getDataCriacao()
-        );
+
+        return ChamadoResponseDTO.fromEntity(chamadoEncontrado);
     }
 
     public ChamadoResponseDTO atualizarStatus(String id, StatusChamado novoStatus){
-        Chamado chamado = chamadoRepository.findById(id)
+        Chamado chamado = chamadoRepository.findByIdAndStatusNot(id, StatusChamado.CANCELADO)
                 .orElseThrow(() -> new ChamadoNaoEncontradoException("Chamado não encontrado com o ID: " + id));
 
         chamado.setStatus(novoStatus);
         Chamado chamadoAtualizado = chamadoRepository.save(chamado);
 
-        return new ChamadoResponseDTO(
-                chamadoAtualizado.getId(),
-                chamadoAtualizado.getTitulo(),
-                chamadoAtualizado.getDescricao(),
-                chamadoAtualizado.getStatus(),
-                chamadoAtualizado.getDataCriacao()
-        );
+        return ChamadoResponseDTO.fromEntity(chamadoAtualizado);
     }
 
     public void deletarChamado(String id){
-        Chamado chamado = chamadoRepository.findById(id)
+        Chamado chamado = chamadoRepository.findByIdAndStatusNot(id, StatusChamado.CANCELADO)
                 .orElseThrow(() -> new ChamadoNaoEncontradoException("Chamado não encontrado com o ID: " + id));
+        chamado.setStatus(StatusChamado.CANCELADO);
 
-        chamadoRepository.delete(chamado);
+        chamadoRepository.save(chamado);
     }
 }

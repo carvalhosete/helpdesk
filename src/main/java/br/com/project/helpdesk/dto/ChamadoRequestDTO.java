@@ -8,5 +8,8 @@ public record ChamadoRequestDTO(
         String titulo,
 
         @NotBlank(message = "A DESCRIÇÃO do chamado é de preenchimento obrigatório.")
-        String descricao
+        String descricao,
+
+        @NotBlank(message = "O ID do user:CLIENTE é OBRIGATÓRIO")
+        String idUsuarioCliente
 ) {}
