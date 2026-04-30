@@ -1,6 +1,5 @@
 package br.com.project.helpdesk.controller;
 
-import br.com.project.helpdesk.domain.StatusChamado;
 import br.com.project.helpdesk.dto.AtualizarStatusDTO;
 import br.com.project.helpdesk.dto.ChamadoRequestDTO;
 import br.com.project.helpdesk.dto.ChamadoResponseDTO;
