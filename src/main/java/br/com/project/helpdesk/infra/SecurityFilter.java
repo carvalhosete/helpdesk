@@ -25,10 +25,10 @@ public class SecurityFilter extends OncePerRequestFilter {
         String token = recuperarToken(request);
 
         if(token != null){
-            String idUsuario = tokenService.validarToken(token);
+            String subject = tokenService.validarToken(token);
 
-            if(idUsuario != null){
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(idUsuario, null, null);
+            if(subject != null){
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(subject, null, null);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
@@ -38,9 +38,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     private String recuperarToken(HttpServletRequest request){
         String authHeader = request.getHeader("Authorization");
-        if(authHeader == null || !authHeader.startsWith("Bearer ")){
-            return null;
-        }
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) return null;
         return authHeader.replace("Bearer ", "");
     }
 
